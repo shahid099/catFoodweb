@@ -57,7 +57,7 @@ Ensure you have **Node.js** (v18.x or higher recommended) and **npm** installed 
    ```
 
 ## 📂 Project Structure Snapshot
-
+```bash
    ├── src/
 │   ├── app/
 │   │   ├── layout.js       # Root wrapper layout containing global layout frames
@@ -67,6 +67,7 @@ Ensure you have **Node.js** (v18.x or higher recommended) and **npm** installed 
 │       ├── Navbar.jsx      # Responsive navigation, client states, search
 │       ├── Footer.jsx      # Multi-column links, mailing list, legal disclaimers
 │       └── WhatsAppButton.jsx # Fixed communication widget
+```
 
 
 
