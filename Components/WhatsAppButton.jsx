@@ -5,7 +5,7 @@ import React from 'react';
 export default function WhatsAppButton() {
   // Replace this with your company's full phone number including country code. 
   // Do not include any plus signs, spaces, or dashes (e.g., 15551234567)
-  const phoneNumber = "96896628191"; 
+  const phoneNumber = "96871009969"; 
   
   // Custom welcome message pre-filled in the user's text box
   const welcomeMessage = "Hi there! I have a question about your cat food products.";

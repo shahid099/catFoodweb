@@ -85,10 +85,10 @@ export default function Nav() {
 
           {/* Mobile Links */}
           <a href="#features" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600">
-            Features
+            Categories
           </a>
           <a href="#pricing" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600">
-            Pricing
+            AboutUs
           </a>
           
           {/* Mobile Login Button */}
