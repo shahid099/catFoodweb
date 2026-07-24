@@ -1,7 +1,8 @@
 "use client"
 import { useState } from 'react';
 import Image from 'next/image';
-import Logo from '../assets/logo.jpeg'
+import Link from 'next/link';
+import { Logo } from '../assets/index'
 export default function Nav() {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -12,9 +13,12 @@ export default function Nav() {
           
           {/* Logo Section */}
           <div className="flex-shrink-0 flex items-center">
-            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent cursor-pointer">
-              <Image src={Logo} alt='Logo' priority className="h-14 w-auto object-contain"/>
-            </span>
+            <Link href="/">
+              <span className="flex items-center justify-center gap-3 text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent cursor-pointer">
+                  <Image src={Logo} alt='Logo' priority className="h-14 w-auto object-contain"/>
+                  <h2 className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-medium">PUREMEOWS</h2>
+              </span>
+            </Link>
           </div>
 
           {/* Desktop Search Bar (Hidden on Mobile) */}
@@ -36,10 +40,12 @@ export default function Nav() {
           {/* Desktop Right Navigation (Hidden on Mobile) */}
           <div className="hidden md:flex items-center space-x-4">
             <a href="#features" className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-medium">Categories</a>
-            <a href="#pricing" className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-medium">AboutUs</a>
-            <button className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-full text-sm font-medium shadow-sm transition-colors">
-              Login
-            </button>
+            <Link href="/about" className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-medium">AboutUs</Link>
+            <Link href='/auth'>
+              <button className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-full text-sm font-medium shadow-sm transition-colors">
+                Login
+              </button>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -87,15 +93,17 @@ export default function Nav() {
           <a href="#features" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600">
             Categories
           </a>
-          <a href="#pricing" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600">
+          <Link href="/about" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600">
             AboutUs
-          </a>
+          </Link>
           
           {/* Mobile Login Button */}
           <div className="pt-2 border-t border-gray-100">
-            <button className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full text-base font-medium shadow-sm transition-colors">
-              Login
-            </button>
+            <Link href='/auth'>
+              <button className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full text-base font-medium shadow-sm transition-colors">
+                Login
+              </button> 
+            </Link>
           </div>
         </div>
       </div>

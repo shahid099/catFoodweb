@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import logo from '../assets/logo.jpeg'; // Reuses your logo import pattern
+import { Logo } from '../assets/index'
 
 export default function Footer() {
   return (
@@ -13,7 +13,7 @@ export default function Footer() {
           <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center cursor-pointer">
               <Image
-                src={logo}
+                src={Logo}
                 alt="Cat Food Brand Logo"
                 className="h-12 w-12 object-contain" // Makes your dark logo white to match the footer background
               />
@@ -23,14 +23,14 @@ export default function Footer() {
             </p>
             {/* Social Media Links */}
             <div className="flex space-x-4 pt-2">
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-amber-300 transition-colors" aria-label="Instagram">
+              <a href="https://www.instagram.com/hasnainali17533?igsh=Mmh3OThpa3NxdzZv" target="_blank" rel="noopener noreferrer" className="hover:text-amber-300 transition-colors" aria-label="Instagram">
                 <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M7 12a5 5 0 1110 0 5 5 0 01-10 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17.5 6.5h.01" />
                   <rect x="2" y="2" width="20" height="20" rx="5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </a>
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="hover:text-amber-300 transition-colors" aria-label="Facebook">
+              <a href="https://www.facebook.com/share/1DE5gnkQNc/" target="_blank" rel="noopener noreferrer" className="hover:text-amber-300 transition-colors" aria-label="Facebook">
                 <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" />
                 </svg>

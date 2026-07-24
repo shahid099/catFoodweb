@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import heroBg from '../assets/catbghomepage.png';
+import { CatBackgroundImage } from '../assets/index'
 import FloatingCartButton from '../Components/FloatingCartButton'
 
 import { MOCK_PRODUCTS } from './productsData'; // Adjust to where you saved the mock data
@@ -39,7 +39,7 @@ export default function HomePage() {
       <header className="relative bg-gray-900 text-white py-20 px-4 sm:px-6 lg:px-8 text-center overflow-hidden">
         {/* 1. Background Image using Next.js Image */}
         <Image
-          src={heroBg}
+          src={CatBackgroundImage}
           alt="Cat eating food banner background"
           fill
           priority
