@@ -18,8 +18,13 @@ const UserSchema = new mongoose.Schema(
       required: [true, 'Password is required'],
       minlength: 6,
     },
+    role: { 
+    type: String, 
+    enum: ['user', 'admin'], 
+    default: 'user' 
+  },
   },
   { timestamps: true }
 );
 
-export default mongoose.models.User || mongoose.model('User', UserSchema);
+export default mongoose.models.Users || mongoose.model('Users', UserSchema);

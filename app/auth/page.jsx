@@ -1,3 +1,5 @@
+
+
 'use client';
 
 import { useState } from 'react';
@@ -54,8 +56,13 @@ export default function AuthPage() {
         throw new Error(data.error || 'Something went wrong.');
       }
 
-      // Success -> Redirect user to homepage
-      router.push('/');
+      // Dynamic redirect based on user role
+      if (data.user?.role === 'admin') {
+        router.push('/admin/dashboard');
+      } else {
+        router.push('/');
+      }
+      
       router.refresh();
     } catch (err) {
       setError(err.message);
@@ -75,7 +82,7 @@ export default function AuthPage() {
         </h2>
         <p className="mt-2 text-center text-sm text-slate-600">
           {isSignUp
-            ? 'Join Maryam\'s Pet Store today'
+            ? "Join Maryam's Pet Store today"
             : 'Sign in to access your account'}
         </p>
       </div>

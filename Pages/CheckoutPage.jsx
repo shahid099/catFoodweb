@@ -86,7 +86,7 @@ export default function CheckoutPage() {
                 value={formData.fullName}
                 onChange={handleChange}
                 placeholder="e.g. Salim Al-Busaidi"
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-900"
+                className="w-full bg-gray-50 border border-gray-200 text-gray-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-900"
               />
             </div>
 
@@ -102,7 +102,7 @@ export default function CheckoutPage() {
                 value={formData.phone}
                 onChange={handleChange}
                 placeholder="+968 9123 4567"
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-900"
+                className="w-full bg-gray-50 border border-gray-200 text-gray-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-900"
               />
             </div>
           </div>
@@ -119,7 +119,7 @@ export default function CheckoutPage() {
               value={formData.area}
               onChange={handleChange}
               placeholder="e.g. Al Khuwair, Muscat"
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-900"
+              className="w-full bg-gray-50 border border-gray-200 text-gray-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-900"
             />
           </div>
 
@@ -135,7 +135,7 @@ export default function CheckoutPage() {
               value={formData.address}
               onChange={handleChange}
               placeholder="Building name, apartment number, way number..."
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-900"
+              className="w-full bg-gray-50 border border-gray-200 text-gray-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-900"
             />
           </div>
 
@@ -150,7 +150,7 @@ export default function CheckoutPage() {
               value={formData.notes}
               onChange={handleChange}
               placeholder="e.g. Call before arrival or leave with security"
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-900"
+              className="w-full bg-gray-50 border border-gray-200 text-gray-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-900"
             />
           </div>
 

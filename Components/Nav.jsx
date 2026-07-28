@@ -1,22 +1,46 @@
 "use client"
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Logo } from '../assets/index'
+
 export default function Nav() {
   const [isOpen, setIsOpen] = useState(false);
+  const [user, setUser] = useState(null);
+
+  // Fetch user details from DB on component mount
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const res = await fetch('/api/auth/me');
+        const data = await res.json();
+
+        if (data.user) {
+          setUser(data.user); // Database user object containing name
+        } else {
+          setUser(null);
+        }
+      } catch (error) {
+        setUser(null);
+      }
+    }
+
+    fetchUser();
+  }, []);
+
+
 
   return (
     <nav className="bg-white shadow-md border-b border-gray-100 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20 items-center">
-          
+
           {/* Logo Section */}
           <div className="flex-shrink-0 flex items-center">
             <Link href="/">
               <span className="flex items-center justify-center gap-3 text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent cursor-pointer">
-                  <Image src={Logo} alt='Logo' priority className="h-14 w-auto object-contain"/>
-                  <h2 className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-medium">PUREMEOWS</h2>
+                <Image src={Logo} alt='Logo' priority className="h-14 w-auto object-contain" />
+                <h2 className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-medium">PUREMEOWS</h2>
               </span>
             </Link>
           </div>
@@ -41,11 +65,26 @@ export default function Nav() {
           <div className="hidden md:flex items-center space-x-4">
             <a href="#features" className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-medium">Categories</a>
             <Link href="/about" className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-medium">AboutUs</Link>
-            <Link href='/auth'>
+            
               <button className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-full text-sm font-medium shadow-sm transition-colors">
-                Login
+
+                {user ? (
+                  /* User Exists: View User Name */
+                  <Link href='/logout'>
+                  <div className="flex items-center gap-2 text-slate-800 font-semibold text-sm">
+                    <span className="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold">
+                      {user.name.charAt(0)}
+                    </span>
+                      <span>{user.name}</span>
+                  </div>
+                    </Link>
+                ) : (
+                  <Link href='/auth'>
+                    <span className="w-full h-full">Login</span>
+                  </Link>
+                )}
+
               </button>
-            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -96,14 +135,29 @@ export default function Nav() {
           <Link href="/about" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600">
             AboutUs
           </Link>
-          
+
           {/* Mobile Login Button */}
           <div className="pt-2 border-t border-gray-100">
-            <Link href='/auth'>
               <button className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full text-base font-medium shadow-sm transition-colors">
-                Login
-              </button> 
-            </Link>
+
+                {user ? (
+                  /* User Exists: View User Name */
+                  <Link href='/logout'>
+                    <div className="flex items-center gap-2 text-slate-800 font-semibold text-sm">
+                      <span className="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold">
+                        {user.name.charAt(0)}
+                      </span>
+                      <span>{user.name}</span>
+                    </div>
+                  </Link>
+                ) : (
+                  <Link href='/auth'>
+                    <span className="w-full h-full">Login</span>
+                  </Link>
+                )}
+
+
+              </button>
           </div>
         </div>
       </div>
