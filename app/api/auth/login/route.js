@@ -4,6 +4,9 @@ import jwt from 'jsonwebtoken';
 import { connectDB } from '@/lib/db';
 import User from '@/models/User';
 
+// 👈 Prevents Next.js from attempting static generation during 'npm run build'
+export const dynamic = 'force-dynamic';
+
 export async function POST(req) {
   try {
     const { email, password } = await req.json();
