@@ -1,6 +1,7 @@
 
 
 'use client';
+import Nav from '../../Components/Nav'
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -68,11 +69,17 @@ export default function AuthPage() {
       setError(err.message);
     } finally {
       setIsLoading(false);
+      router.refresh();
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
+  
+    <>
+      <nav>
+        <Nav />
+      </nav>
+      <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="mx-auto w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg text-white font-bold text-2xl">
           🐾
@@ -82,7 +89,7 @@ export default function AuthPage() {
         </h2>
         <p className="mt-2 text-center text-sm text-slate-600">
           {isSignUp
-            ? "Join Maryam's Pet Store today"
+            ? "Join Hasnan's Pet Store today"
             : 'Sign in to access your account'}
         </p>
       </div>
@@ -202,5 +209,7 @@ export default function AuthPage() {
         </div>
       </div>
     </div>
+    </>
+    
   );
 }

@@ -21,6 +21,7 @@ export default function LogoutPage() {
         console.error('Logout error:', error);
       } finally {
         setIsLoggingOut(false);
+        router.refresh();
 
         // 2. Automatically redirect to homepage after 2 seconds
         const timer = setTimeout(() => {
@@ -66,7 +67,7 @@ export default function LogoutPage() {
 
             <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-center">
               <Link
-                href="/login"
+                href="/auth"
                 className="inline-flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition"
               >
                 Log Back In

@@ -1,11 +1,9 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { CatBackgroundImage } from '../assets/index'
 import FloatingCartButton from '../Components/FloatingCartButton'
-
-import { MOCK_PRODUCTS } from './productsData'; // Adjust to where you saved the mock data
 
 
 export default function HomePage() {
@@ -31,6 +29,41 @@ export default function HomePage() {
 
   // Calculate total items for your navbar/cart counter
   const totalCartCount = Object.values(cartItems).reduce((sum, qty) => sum + qty, 0);
+
+
+
+  // Start to Fetch Data and saved in state Variables
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    async function fetchProducts() {
+      try {
+        const res = await fetch('/api/products');
+        const data = await res.json();
+
+        if (res.ok) {
+          setProducts(data.products);
+        } else {
+          setError(data.error || 'Failed to load products');
+        }
+      } catch (err) {
+        console.error(err);
+        setError('Error connecting to server');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchProducts();
+  }, []);
+
+
+  if (loading) return <div className="text-center p-10">Loading products...</div>;
+  if (error) return <div className="text-center p-10 text-red-500">{error}</div>;
+  //END TO FETCH
+
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 flex flex-col">
@@ -73,12 +106,12 @@ export default function HomePage() {
         {/* Responsive Grid Setup: 1 Column Mobile -> 2 Tablet -> 3 Medium Screen -> 4 Desktop */}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {MOCK_PRODUCTS.map((product) => {
-            const qty = cartItems[product.id] || 0;
+          {products.map((product) => {
+            const qty = cartItems[product._id] || 0;
 
             return (
               <div
-                key={product.id}
+                key={product._id}
                 className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300 flex flex-col group"
               >
                 {/* Product Image Container */}
@@ -89,9 +122,8 @@ export default function HomePage() {
                     </span>
                   )}
                   <Image
-                    src={product.image}
+                    src={product.imageUrl}
                     alt={product.title}
-                    placeholder="blur"
                     fill
                     sizes="(max-w-640px) 100vw, (max-w-768px) 50vw, (max-w-1024px) 33vw, 25vw"
                     className="object-cover object-center group-hover:scale-105 transition-transform duration-300"
@@ -115,14 +147,14 @@ export default function HomePage() {
                   {/* Pricing & Dynamic Cart Control */}
                   <div className="mt-5 pt-4 border-t border-gray-50 flex items-center justify-between gap-2">
                     <span className="text-xl font-extrabold text-gray-900">
-                      ${product.price.toFixed(2)}
+                      <span>OMR</span> {product.price.toFixed(2)}
                     </span>
 
                     {/* Dynamic Button / Counter Controller */}
                     {qty === 0 ? (
                       /* State 1: Standard Add to Cart Button */
                       <button
-                        onClick={() => updateQuantity(product.id, 1)}
+                        onClick={() => updateQuantity(product._id, 1)}
                         className="bg-amber-900 hover:bg-amber-800 text-white text-xs sm:text-sm font-medium px-4 py-2.5 rounded-xl transition-all duration-200 active:scale-95 shadow-sm hover:shadow"
                       >
                         Add to Cart
@@ -131,7 +163,7 @@ export default function HomePage() {
                       /* State 2: Quantity Controls (+ / -) */
                       <div className="flex items-center bg-gray-100 rounded-xl p-1 border border-gray-200">
                         <button
-                          onClick={() => updateQuantity(product.id, -1)}
+                          onClick={() => updateQuantity(product._id, -1)}
                           className="w-8 h-8 rounded-lg bg-white text-gray-700 hover:bg-amber-900 hover:text-white flex items-center justify-center font-bold text-base transition-colors shadow-sm active:scale-90"
                           aria-label="Decrease quantity"
                         >
@@ -141,7 +173,7 @@ export default function HomePage() {
                           {qty}
                         </span>
                         <button
-                          onClick={() => updateQuantity(product.id, 1)}
+                          onClick={() => updateQuantity(product._id, 1)}
                           className="w-8 h-8 rounded-lg bg-white text-gray-700 hover:bg-amber-900 hover:text-white flex items-center justify-center font-bold text-base transition-colors shadow-sm active:scale-90"
                           aria-label="Increase quantity"
                         >

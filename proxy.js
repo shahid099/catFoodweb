@@ -9,7 +9,7 @@ export function proxy(request) {
 
     // Direct unauthenticated users to login
     if (!token) {
-      return NextResponse.redirect(new URL('/login', request.url));
+      return NextResponse.redirect(new URL('/auth', request.url));
     }
   }
 

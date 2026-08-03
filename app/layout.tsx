@@ -3,7 +3,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 // Imports Components
-import Nav from '../Components/Nav'
 import Footer from '../Components/Footer'
 import WhatsAppButton from '../Components/WhatsAppButton'; // Import here
 
@@ -33,7 +32,6 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <Nav />
         {children}
         <Footer />
         {/* Floating safely outside standard layout bounds */}
