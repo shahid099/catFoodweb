@@ -12,7 +12,7 @@ export default function AdminOrdersPage() {
       try {
         const res = await fetch('/api/orders');
         const data = await res.json();
-
+        
         if (res.ok && data.success) {
           setOrders(data.orders);
         } else {
@@ -28,7 +28,7 @@ export default function AdminOrdersPage() {
 
     fetchOrders();
   }, []);
-
+  
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
