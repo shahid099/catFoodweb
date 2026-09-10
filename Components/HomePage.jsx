@@ -10,6 +10,7 @@ export default function HomePage() {
 
   // 1. State to track quantities by product ID (e.g., { 1: 2, 3: 1 })
   const [cartItems, setCartItems] = useState({});
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   // 2. Helper functions to update quantity
   const updateQuantity = (productId, delta) => {
@@ -114,8 +115,11 @@ export default function HomePage() {
                 key={product._id}
                 className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300 flex flex-col group"
               >
-                {/* Product Image Container */}
-                <div className="relative aspect-square w-full bg-gray-100 overflow-hidden">
+                {/* Product Image Container (Clickable) */}
+                <div
+                  onClick={() => setSelectedProduct(product)}
+                  className="relative aspect-square w-full bg-gray-100 overflow-hidden cursor-pointer"
+                >
                   {product.tag && (
                     <span className="absolute top-3 left-3 bg-amber-900 text-white text-xs px-2.5 py-1 rounded-full font-semibold z-10 shadow-sm">
                       {product.tag}
@@ -133,8 +137,11 @@ export default function HomePage() {
                 {/* Product Info & Action Content */}
                 <div className="p-5 flex-1 flex flex-col justify-between">
                   <div>
-                    {/* Title */}
-                    <h3 className="font-semibold text-gray-800 text-base md:text-lg tracking-tight group-hover:text-amber-700 transition-colors line-clamp-1">
+                    {/* Title (Clickable) */}
+                    <h3
+                      onClick={() => setSelectedProduct(product)}
+                      className="font-semibold text-gray-800 text-base md:text-lg tracking-tight group-hover:text-amber-700 transition-colors line-clamp-1 cursor-pointer"
+                    >
                       {product.title}
                     </h3>
 
@@ -152,7 +159,6 @@ export default function HomePage() {
 
                     {/* Dynamic Button / Counter Controller */}
                     {qty === 0 ? (
-                      /* State 1: Standard Add to Cart Button */
                       <button
                         onClick={() => updateQuantity(product._id, 1)}
                         className="bg-amber-900 hover:bg-amber-800 text-white text-xs sm:text-sm font-medium px-4 py-2.5 rounded-xl transition-all duration-200 active:scale-95 shadow-sm hover:shadow"
@@ -160,7 +166,6 @@ export default function HomePage() {
                         Add to Cart
                       </button>
                     ) : (
-                      /* State 2: Quantity Controls (+ / -) */
                       <div className="flex items-center bg-gray-100 rounded-xl p-1 border border-gray-200">
                         <button
                           onClick={() => updateQuantity(product._id, -1)}
@@ -187,6 +192,91 @@ export default function HomePage() {
             );
           })}
         </div>
+        {selectedProduct && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto"
+            onClick={() => setSelectedProduct(null)} // Close when clicking backdrop
+          >
+            {/* Modal Content Box */}
+            <div
+              className="bg-white rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl relative flex flex-col md:flex-row animate-in fade-in zoom-in-95 duration-200"
+              onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
+            >
+              {/* Close Button */}
+              <button
+                onClick={() => setSelectedProduct(null)}
+                className="absolute top-4 right-4 z-20 bg-gray-100 hover:bg-gray-200 text-gray-700 w-9 h-9 rounded-full flex items-center justify-center transition-colors"
+              >
+                ✕
+              </button>
+
+              {/* Big Product Image */}
+              <div className="relative w-full md:w-1/2 aspect-square bg-gray-100">
+                {selectedProduct.tag && (
+                  <span className="absolute top-4 left-4 bg-amber-900 text-white text-xs px-3 py-1 rounded-full font-semibold z-10">
+                    {selectedProduct.tag}
+                  </span>
+                )}
+                <Image
+                  src={selectedProduct.imageUrl}
+                  alt={selectedProduct.title}
+                  fill
+                  className="object-cover object-center"
+                />
+              </div>
+
+              {/* Expanded Product Information */}
+              <div className="p-6 md:p-8 md:w-1/2 flex flex-col justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                    {selectedProduct.title}
+                  </h2>
+
+                  <p className="text-2xl font-extrabold text-amber-900 mb-4">
+                    OMR {selectedProduct.price.toFixed(2)}
+                  </p>
+
+                  <p className="text-gray-600 text-sm leading-relaxed mb-6 max-h-48 overflow-y-auto">
+                    {selectedProduct.description}
+                  </p>
+                </div>
+
+                {/* Modal Cart Action */}
+                <div className="pt-4 border-t border-gray-100">
+                  {cartItems[selectedProduct._id] ? (
+                    <div className="flex items-center justify-between bg-gray-100 p-2 rounded-xl">
+                      <span className="text-sm font-semibold text-gray-700">Quantity:</span>
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={() => updateQuantity(selectedProduct._id, -1)}
+                          className="w-8 h-8 rounded-lg bg-white text-gray-700 hover:bg-amber-900 hover:text-white flex items-center justify-center font-bold"
+                        >
+                          -
+                        </button>
+                        <span className="font-bold text-gray-800">
+                          {cartItems[selectedProduct._id]}
+                        </span>
+                        <button
+                          onClick={() => updateQuantity(selectedProduct._id, 1)}
+                          className="w-8 h-8 rounded-lg bg-white text-gray-700 hover:bg-amber-900 hover:text-white flex items-center justify-center font-bold"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => updateQuantity(selectedProduct._id, 1)}
+                      className="w-full bg-amber-900 hover:bg-amber-800 text-white font-semibold py-3 rounded-xl transition-colors shadow-md"
+                    >
+                      Add to Cart
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
 
       {/* 🛒 Floating Cart Button */}
