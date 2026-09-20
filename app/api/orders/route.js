@@ -33,15 +33,20 @@ export async function GET() {
     const populatedOrders = orders.map((order) => {
       const itemsMap = order.items instanceof Map ? Object.fromEntries(order.items) : order.items || {};
       
-      const detailedItems = Object.entries(itemsMap).map(([productId, quantity]) => ({
-        quantity,
-        product: productMap[productId] || {
-          _id: productId,
-          title: 'Product Unavailable',
-          price: 0,
-          imageUrl: '',
-        },
-      }));
+      const detailedItems = Object.entries(itemsMap).map(([productId, itemData]) => {
+        // Handles cases where itemData is a quantity number or an object { price, quantity }
+        const quantity = typeof itemData === 'number' ? itemData : itemData?.quantity || 1;
+        
+        return {
+          quantity,
+          product: productMap[productId] || {
+            _id: productId,
+            title: 'Product Unavailable',
+            price: 0,
+            imageUrl: '',
+          },
+        };
+      });
 
       return {
         ...order,
@@ -101,21 +106,42 @@ export async function PATCH(request) {
 }
 
 
-
 // POST: Place a new order
 export async function POST(request) {
   try {
     await connectDB();
 
     const body = await request.json();
-    const { fullName, phone, area, address, notes, items } = body;
+    const { 
+      fullName, 
+      phone, 
+      area, 
+      address, 
+      notes, 
+      items, 
+      paymentMethod, 
+      subtotal, 
+      deliveryFee, 
+      totalAmount 
+    } = body;
 
     if (!fullName || !phone || !area || !address) {
       return NextResponse.json(
-        { success: false, error: 'Missing required fields' },
+        { success: false, error: 'Missing required customer details.' },
         { status: 400 }
       );
     }
+
+    if (!items || Object.keys(items).length === 0) {
+      return NextResponse.json(
+        { success: false, error: 'Cart is empty.' },
+        { status: 400 }
+      );
+    }
+
+    // Convert paymentMethod code ('cash'/'card') to clean readable label
+    const formattedPaymentMethod = 
+      paymentMethod === 'card' ? 'Card on Delivery (POS)' : 'Cash on Delivery';
 
     const newOrder = await Order.create({
       customer: {
@@ -126,8 +152,11 @@ export async function POST(request) {
         notes: notes || '',
       },
       items: items || {},
+      subtotal: Number(subtotal) || 0,
+      deliveryFee: Number(deliveryFee) || 4.00,
+      totalAmount: Number(totalAmount) || 0,
+      paymentMethod: formattedPaymentMethod,
       status: 'Pending',
-      paymentMethod: 'Cash on Delivery',
     });
 
     return NextResponse.json(

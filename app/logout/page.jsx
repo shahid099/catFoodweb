@@ -7,7 +7,7 @@ import { LogOut, CheckCircle2, ArrowRight } from 'lucide-react';
 
 export default function LogoutPage() {
   const router = useRouter();
-  const [isLoggingOut, setIsLoggingOut] = useState(true);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
     const performLogout = async () => {

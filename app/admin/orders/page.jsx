@@ -33,6 +33,8 @@ export default function AdminOrdersPage() {
     fetchOrders();
   }, []);
 
+  console.log('Orders here:', orders)
+
   const toggleOrder = (orderId) => {
     setExpandedOrders((prev) => ({
       ...prev,
@@ -132,7 +134,7 @@ export default function AdminOrdersPage() {
               Total Revenue
             </p>
             <p className="text-2xl font-bold text-emerald-900 mt-2">
-              OMR {totalRevenue.toFixed(2)}
+              OMR {totalRevenue.toFixed(3)}
             </p>
           </div>
         </div>
@@ -208,7 +210,8 @@ export default function AdminOrdersPage() {
 
                       {/* Total Price */}
                       <div className="font-bold text-sm text-gray-900">
-                        OMR {orderTotal.toFixed(2)}
+                        OMR {orderTotal.toFixed(3)}
+                      <div className="flex font-extralight">{order.paymentMethod}</div>
                       </div>
 
                       {/* Interactive Status Selector */}
