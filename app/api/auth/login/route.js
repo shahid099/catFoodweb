@@ -1,59 +1,114 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+
 import { connectDB } from '@/lib/db';
 import User from '@/models/User';
 
-// 👈 Prevents Next.js from attempting static generation during 'npm run build'
+// Prevent Next.js from attempting static generation during build
 export const dynamic = 'force-dynamic';
 
 export async function POST(req) {
   try {
-    const { email, password } = await req.json();
+    const { identifier, email, phone, password } = await req.json();
 
-    if (!email || !password) {
+    // Accept identifier directly or fall back to email/phone
+    const userIdentifier = identifier || email || phone;
+
+    if (!userIdentifier || !password) {
       return NextResponse.json(
-        { error: 'Email and password are required.' },
+        {
+          success: false,
+          error: 'Email or phone number and password are required.',
+        },
         { status: 400 }
       );
     }
 
     await connectDB();
 
-    // Find existing user
-    const user = await User.findOne({ email });
+    // ---------------------------------------
+    // Find user by email OR phone
+    // ---------------------------------------
+    const identifierValue = userIdentifier.trim();
+
+    const user = await User.findOne({
+      $or: [
+        { email: identifierValue.toLowerCase() },
+        { phone: identifierValue },
+      ],
+    });
+
     if (!user) {
       return NextResponse.json(
-        { error: 'Invalid email or password.' },
+        {
+          success: false,
+          error: 'Invalid credentials.',
+        },
         { status: 401 }
       );
     }
 
-    // Verify hashed password
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    // ---------------------------------------
+    // Verify password
+    // ---------------------------------------
+    const isPasswordValid = await bcrypt.compare(
+      password,
+      user.password
+    );
+
     if (!isPasswordValid) {
       return NextResponse.json(
-        { error: 'Invalid email or password.' },
+        {
+          success: false,
+          error: 'Invalid credentials.',
+        },
         { status: 401 }
       );
     }
 
-    // Create session token
+    // ---------------------------------------
+    // Create JWT
+    // ---------------------------------------
     const token = jwt.sign(
-      { userId: user._id, email: user.email },
+      {
+        userId: user._id.toString(),
+        email: user.email || '',
+        phone: user.phone || '',
+        role: user.role || 'customer',
+      },
       process.env.JWT_SECRET,
-      { expiresIn: '7d' }
+      {
+        expiresIn: '7d',
+      }
     );
 
+    // ---------------------------------------
+    // Prepare response
+    // ---------------------------------------
     const response = NextResponse.json(
       {
+        success: true,
         message: 'Logged in successfully',
-        user: { id: user._id, name: user.name, email: user.email },
+
+        user: {
+          id: user._id,
+          fullName: user.fullName || user.name || '',
+          email: user.email || '',
+          phone: user.phone || '',
+          address: user.address || '',
+          area: user.area || '',
+          role: user.role || 'customer',
+        },
       },
-      { status: 200 }
+      {
+        status: 200,
+      }
     );
 
-    // Store token securely in HTTP-only cookie
+    // ---------------------------------------
+    // Store JWT in HTTP-only cookie
+    // ---------------------------------------
     response.cookies.set('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -65,8 +120,12 @@ export async function POST(req) {
     return response;
   } catch (error) {
     console.error('Login Error:', error);
+
     return NextResponse.json(
-      { error: 'Internal server error.' },
+      {
+        success: false,
+        error: 'Internal server error.',
+      },
       { status: 500 }
     );
   }

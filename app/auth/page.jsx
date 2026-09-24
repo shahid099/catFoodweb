@@ -1,18 +1,18 @@
-
-
 'use client';
-import Nav from '../../Components/Nav'
+import Nav from '../../Components/Nav';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Eye, EyeOff, Lock, Mail, User, ArrowRight } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail, Phone, User, ArrowRight } from 'lucide-react';
 
 export default function AuthPage() {
   const router = useRouter();
 
   const [isSignUp, setIsSignUp] = useState(false);
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState(''); // For Login: Email or Phone
+  const [email, setEmail] = useState('');           // For Sign Up
+  const [phone, setPhone] = useState('');           // For Sign Up
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -22,7 +22,9 @@ export default function AuthPage() {
     setIsSignUp(!isSignUp);
     setError('');
     setName('');
+    setIdentifier('');
     setEmail('');
+    setPhone('');
     setPassword('');
   };
 
@@ -30,19 +32,33 @@ export default function AuthPage() {
     e.preventDefault();
     setError('');
 
-    if (isSignUp && !name.trim()) {
-      setError('Please enter your full name.');
+    if (!password) {
+      setError('Please enter your password.');
       return;
     }
-    if (!email || !password) {
-      setError('Please fill in all required fields.');
-      return;
+
+    if (isSignUp) {
+      if (!name.trim()) {
+        setError('Please enter your full name.');
+        return;
+      }
+      if (!email.trim() && !phone.trim()) {
+        setError('Please provide either an email or a phone number.');
+        return;
+      }
+    } else {
+      if (!identifier.trim()) {
+        setError('Please enter your email or phone number.');
+        return;
+      }
     }
 
     setIsLoading(true);
 
     const endpoint = isSignUp ? '/api/auth/signup' : '/api/auth/login';
-    const payload = isSignUp ? { name, email, password } : { email, password };
+    const payload = isSignUp
+      ? { name, email, phone, password }
+      : { identifier, password };
 
     try {
       const res = await fetch(endpoint, {
@@ -59,11 +75,11 @@ export default function AuthPage() {
 
       // Dynamic redirect based on user role
       if (data.user?.role === 'admin') {
-        router.push('/admin/dashboard');
+        router.push('/admin');
       } else {
         router.push('/');
       }
-      
+
       router.refresh();
     } catch (err) {
       setError(err.message);
@@ -74,142 +90,187 @@ export default function AuthPage() {
   };
 
   return (
-  
     <>
       <nav>
         <Nav />
       </nav>
       <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="mx-auto w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg text-white font-bold text-2xl">
-          🐾
+        <div className="sm:mx-auto sm:w-full sm:max-w-md">
+          <div className="mx-auto w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg text-white font-bold text-2xl">
+            🐾
+          </div>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-slate-900">
+            {isSignUp ? 'Create an account' : 'Welcome back'}
+          </h2>
+          <p className="mt-2 text-center text-sm text-slate-600">
+            {isSignUp
+              ? "Join Hasnan's Pet Store today"
+              : 'Sign in to access your account'}
+          </p>
         </div>
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-slate-900">
-          {isSignUp ? 'Create an account' : 'Welcome back'}
-        </h2>
-        <p className="mt-2 text-center text-sm text-slate-600">
-          {isSignUp
-            ? "Join Hasnan's Pet Store today"
-            : 'Sign in to access your account'}
-        </p>
-      </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow-xl shadow-slate-100 sm:rounded-2xl sm:px-10 border border-slate-100">
-          <form className="space-y-5" onSubmit={handleSubmit}>
-            {error && (
-              <div className="bg-red-50 border-l-4 border-red-500 p-4 text-sm text-red-700 rounded-r-md">
-                {error}
-              </div>
-            )}
+        <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+          <div className="bg-white py-8 px-4 shadow-xl shadow-slate-100 sm:rounded-2xl sm:px-10 border border-slate-100">
+            <form className="space-y-5" onSubmit={handleSubmit}>
+              {error && (
+                <div className="bg-red-50 border-l-4 border-red-500 p-4 text-sm text-red-700 rounded-r-md">
+                  {error}
+                </div>
+              )}
 
-            {isSignUp && (
+              {isSignUp && (
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium text-slate-700">
+                    Full Name
+                  </label>
+                  <div className="mt-1 relative rounded-md shadow-sm">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                      <User className="h-5 w-5" />
+                    </div>
+                    <input
+                      id="name"
+                      name="name"
+                      type="text"
+                      required={isSignUp}
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Alex Johnson"
+                      className="block w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm transition duration-150"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Login mode: Single identifier field */}
+              {!isSignUp ? (
+                <div>
+                  <label htmlFor="identifier" className="block text-sm font-medium text-slate-700">
+                    Email Address or Phone Number
+                  </label>
+                  <div className="mt-1 relative rounded-md shadow-sm">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                      <Mail className="h-5 w-5" />
+                    </div>
+                    <input
+                      id="identifier"
+                      name="identifier"
+                      type="text"
+                      required
+                      value={identifier}
+                      onChange={(e) => setIdentifier(e.target.value)}
+                      placeholder="user@example.com or +1234567890"
+                      className="block w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm transition duration-150"
+                    />
+                  </div>
+                </div>
+              ) : (
+                /* Sign Up mode: Separate email and phone fields */
+                <>
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-medium text-slate-700">
+                      Email Address <span className="text-xs text-slate-400">(Optional if phone is provided)</span>
+                    </label>
+                    <div className="mt-1 relative rounded-md shadow-sm">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                        <Mail className="h-5 w-5" />
+                      </div>
+                      <input
+                        id="email"
+                        name="email"
+                        type="email"
+                        autoComplete="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="user@example.com"
+                        className="block w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm transition duration-150"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label htmlFor="phone" className="block text-sm font-medium text-slate-700">
+                      Phone Number <span className="text-xs text-slate-400">(Optional if email is provided)</span>
+                    </label>
+                    <div className="mt-1 relative rounded-md shadow-sm">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                        <Phone className="h-5 w-5" />
+                      </div>
+                      <input
+                        id="phone"
+                        name="phone"
+                        type="tel"
+                        autoComplete="tel"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        placeholder="+1234567890"
+                        className="block w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm transition duration-150"
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-slate-700">
-                  Full Name
+                <label htmlFor="password" className="block text-sm font-medium text-slate-700">
+                  Password
                 </label>
                 <div className="mt-1 relative rounded-md shadow-sm">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                    <User className="h-5 w-5" />
+                    <Lock className="h-5 w-5" />
                   </div>
                   <input
-                    id="name"
-                    name="name"
-                    type="text"
-                    required={isSignUp}
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Alex Johnson"
-                    className="block w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm transition duration-150"
+                    id="password"
+                    name="password"
+                    type={showPassword ? 'text' : 'password'}
+                    autoComplete={isSignUp ? 'new-password' : 'current-password'}
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="block w-full pl-10 pr-10 py-2.5 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm transition duration-150"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none"
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
                 </div>
               </div>
-            )}
 
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-700">
-                Email Address
-              </label>
-              <div className="mt-1 relative rounded-md shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                  <Mail className="h-5 w-5" />
-                </div>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="user@example.com"
-                  className="block w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm transition duration-150"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-slate-700">
-                Password
-              </label>
-              <div className="mt-1 relative rounded-md shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                  <Lock className="h-5 w-5" />
-                </div>
-                <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? 'text' : 'password'}
-                  autoComplete={isSignUp ? 'new-password' : 'current-password'}
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="block w-full pl-10 pr-10 py-2.5 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm transition duration-150"
-                />
+              <div>
                 <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none"
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-xl shadow-md text-sm font-semibold text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition duration-200 disabled:opacity-70 disabled:cursor-not-allowed mt-2"
                 >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  {isLoading ? (
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  ) : (
+                    <>
+                      {isSignUp ? 'Create Account' : 'Sign In'} <ArrowRight className="ml-2 h-4 w-4" />
+                    </>
+                  )}
                 </button>
               </div>
-            </div>
+            </form>
 
-            <div>
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-xl shadow-md text-sm font-semibold text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition duration-200 disabled:opacity-70 disabled:cursor-not-allowed mt-2"
-              >
-                {isLoading ? (
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                ) : (
-                  <>
-                    {isSignUp ? 'Create Account' : 'Sign In'} <ArrowRight className="ml-2 h-4 w-4" />
-                  </>
-                )}
-              </button>
+            <div className="mt-6 text-center border-t border-slate-100 pt-5">
+              <p className="text-sm text-slate-600">
+                {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
+                <button
+                  type="button"
+                  onClick={toggleMode}
+                  className="font-medium text-orange-500 hover:text-orange-600 transition duration-150 focus:outline-none underline"
+                >
+                  {isSignUp ? 'Sign in' : 'Sign up'}
+                </button>
+              </p>
             </div>
-          </form>
-
-          <div className="mt-6 text-center border-t border-slate-100 pt-5">
-            <p className="text-sm text-slate-600">
-              {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
-              <button
-                type="button"
-                onClick={toggleMode}
-                className="font-medium text-orange-500 hover:text-orange-600 transition duration-150 focus:outline-none underline"
-              >
-                {isSignUp ? 'Sign in' : 'Sign up'}
-              </button>
-            </p>
           </div>
         </div>
       </div>
-    </div>
     </>
-    
   );
 }

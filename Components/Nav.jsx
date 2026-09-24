@@ -63,8 +63,9 @@ export default function Nav() {
 
           {/* Desktop Right Navigation (Hidden on Mobile) */}
           <div className="hidden md:flex items-center space-x-4">
-            <a href="#features" className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-medium">Categories</a>
+            <Link href="#features" className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-medium">Categories</Link>
             <Link href="/about" className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-medium">AboutUs</Link>
+            <Link href="/user" className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-medium">Orders</Link>
             
               <button className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-full text-sm font-medium shadow-sm transition-colors">
 
@@ -80,7 +81,7 @@ export default function Nav() {
                     </Link>
                 ) : (
                   <Link href='/auth'>
-                    <span className="w-full h-full">Login</span>
+                    <span className="w-full h-full">Account</span>
                   </Link>
                 )}
 
@@ -135,6 +136,10 @@ export default function Nav() {
           <Link href="/about" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600">
             AboutUs
           </Link>
+          <Link href="/user" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600">
+            Orders
+          </Link>
+
 
           {/* Mobile Login Button */}
           <div className="pt-2 border-t border-gray-100">

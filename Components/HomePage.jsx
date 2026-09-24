@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { CatBackgroundImage } from '../assets/index';
 import FloatingCartButton from '../Components/FloatingCartButton';
+import Spinner from './Spinner';
 
 export default function HomePage() {
   // 1. Initialize cart state (will be populated from localStorage after mount)
@@ -81,8 +82,14 @@ export default function HomePage() {
     fetchProducts();
   }, []);
 
-  if (loading) return <div className="text-center p-10">Loading products...</div>;
-  if (error) return <div className="text-center p-10 text-red-500">{error}</div>;
+  if (loading) 
+    // Centers the spinner perfectly across the entire viewport
+  return (
+    <div className="flex h-screen w-screen items-center justify-center bg-white dark:bg-gray-900">
+      <Spinner />
+    </div>
+  );
+  if (error) return <div className="min-h-screen text-center p-10 text-red-500">{error}</div>;
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 flex flex-col">

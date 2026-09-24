@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
+import { UserProvider } from '../context/UserContext'; // Adjust path if needed
+
 // Imports Components
 import Footer from '../Components/Footer'
 import WhatsAppButton from '../Components/WhatsAppButton'; // Import here
@@ -32,10 +34,12 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        {children}
-        <Footer />
-        {/* Floating safely outside standard layout bounds */}
-        <WhatsAppButton />
+        <UserProvider>
+          {children}
+          <Footer />
+          {/* Floating safely outside standard layout bounds */}
+          <WhatsAppButton />
+        </UserProvider>
       </body>
     </html>
   );
