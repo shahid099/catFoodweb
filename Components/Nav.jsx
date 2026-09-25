@@ -65,7 +65,7 @@ export default function Nav() {
           <div className="hidden md:flex items-center space-x-4">
             <Link href="#features" className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-medium">Categories</Link>
             <Link href="/about" className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-medium">AboutUs</Link>
-            <Link href="/user" className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-medium">Orders</Link>
+            <Link href="/orderhistory" className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-medium">Orders</Link>
             
               <button className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-full text-sm font-medium shadow-sm transition-colors">
 
@@ -136,7 +136,7 @@ export default function Nav() {
           <Link href="/about" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600">
             AboutUs
           </Link>
-          <Link href="/user" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600">
+          <Link href="/orderhistory" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600">
             Orders
           </Link>
 

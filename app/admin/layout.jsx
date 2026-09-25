@@ -98,7 +98,7 @@ export default function AdminLayout({ children }) {
             </Link>
 
             <Link
-              href="/admin/orders"
+              href="/admin/all-orders"
               className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition ${
                 pathname.startsWith('/admin/orders')
                   ? 'bg-orange-500 text-white shadow-md'
@@ -106,7 +106,7 @@ export default function AdminLayout({ children }) {
               }`}
             >
               <ShoppingBag className="w-5 h-5" />
-              Orders
+              All Orders
             </Link>
 
             <Link

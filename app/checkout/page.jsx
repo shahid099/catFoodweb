@@ -60,7 +60,7 @@ export default function CheckoutPage() {
 
   // Load cart data passed via localStorage
   useEffect(() => {
-    const savedCart = localStorage.getItem('cat_food_cart');
+    const savedCart = localStorage.getItem('cartItems');
     if (savedCart) {
       try {
         const parsedCart = JSON.parse(savedCart);
@@ -146,7 +146,7 @@ export default function CheckoutPage() {
 
       if (response.ok && data.success) {
         setFormSubmitted(true);
-        localStorage.removeItem('cat_food_cart');
+        localStorage.removeItem('cartItems');
       } else {
         setErrorMessage(data.error || 'Failed to submit order. Please try again.');
       }

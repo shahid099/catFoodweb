@@ -265,7 +265,7 @@ export default function UserProfileDashboard() {
 
                       {/* Total */}
                       <div className="text-xs font-bold text-slate-900">
-                        OMR {totalAmount.toFixed(2)}
+                        {/* OMR {totalAmount.toFixed(3)} */}
                       </div>
 
                       {/* Status + Date */}

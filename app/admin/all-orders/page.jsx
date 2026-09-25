@@ -1,22 +1,28 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 const STATUS_OPTIONS = ['Pending', 'Processing', 'Delivered', 'Cancelled'];
 
-export default function AdminOrdersPage() {
+export default function AllOrdersPage() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [expandedOrders, setExpandedOrders] = useState({});
   const [updatingId, setUpdatingId] = useState(null);
 
+  // Search, Filter & Sort state
+  const [searchTerm, setSearchTerm] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [sortBy, setSortBy] = useState('a-z'); // 'a-z', 'z-a', 'newest', 'oldest'
+
   useEffect(() => {
     async function fetchOrders() {
       try {
-        const res = await fetch('/api/orders');
+        const res = await fetch('/api/allorders');
         const data = await res.json();
-        
+
         if (res.ok && data.success) {
           setOrders(data.orders);
         } else {
@@ -33,8 +39,6 @@ export default function AdminOrdersPage() {
     fetchOrders();
   }, []);
 
-  console.log('Orders here:', orders)
-
   const toggleOrder = (orderId) => {
     setExpandedOrders((prev) => ({
       ...prev,
@@ -42,7 +46,6 @@ export default function AdminOrdersPage() {
     }));
   };
 
-  // Handle status updating
   const handleStatusChange = async (orderId, newStatus) => {
     setUpdatingId(orderId);
     try {
@@ -55,7 +58,6 @@ export default function AdminOrdersPage() {
       const data = await res.json();
 
       if (res.ok && data.success) {
-        // Update local state immediately
         setOrders((prevOrders) =>
           prevOrders.map((order) =>
             order._id === orderId ? { ...order, status: newStatus } : order
@@ -71,6 +73,61 @@ export default function AdminOrdersPage() {
       setUpdatingId(null);
     }
   };
+
+  // Filter and sort logic
+  const filteredAndSortedOrders = useMemo(() => {
+    return orders
+      .filter((order) => {
+        // Search term matching (Name, Phone, Area, Order ID)
+        const term = searchTerm.toLowerCase().trim();
+        const customerName = (order.customer?.fullName || '').toLowerCase();
+        const phone = (order.customer?.phone || '').toLowerCase();
+        const area = (order.customer?.area || '').toLowerCase();
+        const orderId = (order._id || '').toLowerCase();
+
+        const matchesSearch =
+          !term ||
+          customerName.includes(term) ||
+          phone.includes(term) ||
+          area.includes(term) ||
+          orderId.includes(term);
+
+        // Date range matching
+        const orderDate = new Date(order.createdAt);
+        orderDate.setHours(0, 0, 0, 0);
+
+        let matchesStartDate = true;
+        if (startDate) {
+          const start = new Date(startDate);
+          start.setHours(0, 0, 0, 0);
+          matchesStartDate = orderDate >= start;
+        }
+
+        let matchesEndDate = true;
+        if (endDate) {
+          const end = new Date(endDate);
+          end.setHours(23, 59, 59, 999);
+          matchesEndDate = orderDate <= end;
+        }
+
+        return matchesSearch && matchesStartDate && matchesEndDate;
+      })
+      .sort((a, b) => {
+        if (sortBy === 'a-z') {
+          return (a.customer?.fullName || '').localeCompare(b.customer?.fullName || '');
+        }
+        if (sortBy === 'z-a') {
+          return (b.customer?.fullName || '').localeCompare(a.customer?.fullName || '');
+        }
+        if (sortBy === 'newest') {
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        }
+        if (sortBy === 'oldest') {
+          return new Date(a.createdAt) - new Date(b.createdAt);
+        }
+        return 0;
+      });
+  }, [orders, searchTerm, startDate, endDate, sortBy]);
 
   if (loading) {
     return (
@@ -90,36 +147,43 @@ export default function AdminOrdersPage() {
     );
   }
 
-  const totalOrders = orders.length;
-  const pendingOrders = orders.filter((o) => o.status === 'Pending').length;
-  const totalRevenue = orders.reduce((sum, order) => {
+  const totalOrders = filteredAndSortedOrders.length;
+  const pendingOrders = filteredAndSortedOrders.filter((o) => o.status === 'Pending').length;
+  const totalRevenue = filteredAndSortedOrders.reduce((sum, order) => {
     const orderTotal = Array.isArray(order.items)
       ? order.items.reduce((itemSum, item) => itemSum + ((item.product?.price || 0) * item.quantity), 0)
       : 0;
     return sum + orderTotal;
   }, 0);
 
+  const clearFilters = () => {
+    setSearchTerm('');
+    setStartDate('');
+    setEndDate('');
+    setSortBy('a-z');
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto space-y-6">
         
         {/* Page Header */}
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900">
-              Orders Dashboard
+              All Orders Archive
             </h1>
             <p className="text-sm text-gray-500 mt-1">
-              Manage and review customer orders
+              Browse, filter by date, and search through all historical orders from A to Z
             </p>
           </div>
         </div>
 
-        {/* Analytics Cards */}
+        {/* Analytics Cards (Reflects Filtered Results) */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-              Total Orders
+              Filtered Orders
             </p>
             <p className="text-2xl font-bold text-gray-900 mt-2">{totalOrders}</p>
           </div>
@@ -131,7 +195,7 @@ export default function AdminOrdersPage() {
           </div>
           <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
             <p className="text-xs font-semibold text-emerald-800 uppercase tracking-wider">
-              Total Revenue
+              Filtered Revenue
             </p>
             <p className="text-2xl font-bold text-emerald-900 mt-2">
               OMR {totalRevenue.toFixed(3)}
@@ -139,19 +203,97 @@ export default function AdminOrdersPage() {
           </div>
         </div>
 
-        {/* Orders List Container */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-100">
-            <h2 className="text-base font-bold text-gray-800">Recent Orders</h2>
+        {/* Search & Date Filter Bar */}
+        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-sm space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            
+            {/* Search Input */}
+            <div>
+              <label className="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">
+                Search
+              </label>
+              <input
+                type="text"
+                placeholder="Name, phone, area, order ID..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full text-xs font-medium px-3.5 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-amber-500 transition-colors bg-gray-50/50"
+              />
+            </div>
+
+            {/* Start Date */}
+            <div>
+              <label className="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">
+                From Date
+              </label>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="w-full text-xs font-medium px-3.5 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-amber-500 transition-colors bg-gray-50/50 text-gray-700"
+              />
+            </div>
+
+            {/* End Date */}
+            <div>
+              <label className="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">
+                To Date
+              </label>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="w-full text-xs font-medium px-3.5 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-amber-500 transition-colors bg-gray-50/50 text-gray-700"
+              />
+            </div>
+
+            {/* Sort Dropdown */}
+            <div>
+              <label className="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">
+                Sort By
+              </label>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="w-full text-xs font-medium px-3.5 py-2.5 rounded-xl border border-gray-200 outline-none focus:border-amber-500 transition-colors bg-gray-50/50 text-gray-700 cursor-pointer"
+              >
+                <option value="a-z">Customer Name (A to Z)</option>
+                <option value="z-a">Customer Name (Z to A)</option>
+                <option value="newest">Date (Newest First)</option>
+                <option value="oldest">Date (Oldest First)</option>
+              </select>
+            </div>
           </div>
 
-          {orders.length === 0 ? (
+          {(searchTerm || startDate || endDate || sortBy !== 'a-z') && (
+            <div className="flex justify-end pt-2 border-t border-gray-100">
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="text-xs font-semibold text-amber-900 hover:text-amber-700 transition-colors cursor-pointer"
+              >
+                Clear Filters
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Orders List Container */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+            <h2 className="text-base font-bold text-gray-800">All Orders</h2>
+            <span className="text-xs font-semibold text-gray-400">
+              Showing {filteredAndSortedOrders.length} of {orders.length}
+            </span>
+          </div>
+
+          {filteredAndSortedOrders.length === 0 ? (
             <div className="p-8 text-center text-gray-500 text-sm">
-              No orders found yet.
+              No orders found matching your search or date criteria.
             </div>
           ) : (
             <div className="divide-y divide-gray-100">
-              {orders.map((order) => {
+              {filteredAndSortedOrders.map((order) => {
                 const itemsList = Array.isArray(order.items) ? order.items : [];
                 const isExpanded = !!expandedOrders[order._id];
 
@@ -211,7 +353,7 @@ export default function AdminOrdersPage() {
                       {/* Total Price */}
                       <div className="font-bold text-sm text-gray-900">
                         OMR {orderTotal.toFixed(3)}
-                      <div className="flex font-extralight">{order.paymentMethod}</div>
+                        <div className="flex font-extralight text-xs text-gray-500">{order.paymentMethod}</div>
                       </div>
 
                       {/* Interactive Status Selector */}
@@ -241,6 +383,7 @@ export default function AdminOrdersPage() {
                           {new Date(order.createdAt).toLocaleDateString('en-GB', {
                             day: 'numeric',
                             month: 'short',
+                            year: 'numeric'
                           })}
                         </span>
                       </div>

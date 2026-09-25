@@ -111,7 +111,7 @@ export default function HomePage() {
             Order Best Cat Food in Muscat
           </h1>
           <p className="text-gray-100 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto drop-shadow">
-            Spoil your favorite feline with recipes they will actually crave! From premium salmon patés to crunchy grain-free kibble, we make healthy cat food that keeps tails wagging and bowls empty. Grab 15% off your first box!
+            Give your cat the healthy, simple food they deserve. From soft salmon mixes to crunchy kibble, our recipes offer great taste made with high-quality ingredients. Get 15% off your first box!
           </p>
         </div>
       </header>
