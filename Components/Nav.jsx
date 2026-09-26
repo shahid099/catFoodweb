@@ -81,7 +81,7 @@ export default function Nav() {
                     </Link>
                 ) : (
                   <Link href='/auth'>
-                    <span className="w-full h-full">Account</span>
+                    <div className="w-full h-full">Account</span>
                   </Link>
                 )}
 
@@ -157,7 +157,7 @@ export default function Nav() {
                   </Link>
                 ) : (
                   <Link href='/auth'>
-                    <span className="w-full h-full">Login</span>
+                    <div className="w-full h-full">Login</div>
                   </Link>
                 )}
 
