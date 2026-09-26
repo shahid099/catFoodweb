@@ -71,7 +71,7 @@ export default function Nav() {
 
                 {user ? (
                   /* User Exists: View User Name */
-                  <Link href='/user'>
+                  <Link href='/orderhistory'>
                   <div className="flex items-center gap-2 text-slate-800 font-semibold text-sm">
                     <span className="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold">
                       {user.name.charAt(0)}
@@ -81,7 +81,7 @@ export default function Nav() {
                     </Link>
                 ) : (
                   <Link href='/auth'>
-                    <div className="w-full h-full">Account</span>
+                    <div className="w-full h-full">Account</div>
                   </Link>
                 )}
 
